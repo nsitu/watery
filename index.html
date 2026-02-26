@@ -4,128 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Watery – CHS Stations</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-      background: #f5f5f5;
-      color: #333;
-    }
-    h1 {
-      font-size: 1.6rem;
-      margin-bottom: 0.25rem;
-    }
-    p.subtitle {
-      color: #666;
-      margin-bottom: 1.5rem;
-    }
-    #status {
-      margin-bottom: 1rem;
-      font-style: italic;
-      color: #888;
-    }
-    ul#station-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    ul#station-list li {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.5rem 0.75rem;
-      margin-bottom: 0.4rem;
-      border-radius: 4px;
-      background: #fff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    .dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .dot.active   { background: #2ecc71; }
-    .dot.inactive { background: #aaa; }
-
-    .station-name {
-      flex: 1;
-    }
-    .station-name.active   { color: #1a7a42; font-weight: 500; }
-    .station-name.inactive { color: #888; }
-
-    .station-code {
-      font-size: 0.8rem;
-      color: #bbb;
-    }
-    #error {
-      color: #c0392b;
-      background: #fdf2f2;
-      border: 1px solid #e74c3c;
-      border-radius: 4px;
-      padding: 0.75rem 1rem;
-      display: none;
-    }
-  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <h1>🌊 Watery</h1>
   <p class="subtitle">Canadian Hydrographic Service – Water Level Stations</p>
   <div id="status" aria-live="polite">Loading stations…</div>
   <div id="error"></div>
-  <ul id="station-list"></ul>
+  <div id="map"></div>
 
-  <script>
-    const API_URL = 'https://api-sine.dfo-mpo.gc.ca/api/v1/stations';
-
-    async function loadStations() {
-      const statusEl = document.getElementById('status');
-      const errorEl  = document.getElementById('error');
-      const listEl   = document.getElementById('station-list');
-
-      try {
-        const response = await fetch(API_URL);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        const stations = await response.json();
-
-        statusEl.textContent = `${stations.length} station${stations.length !== 1 ? 's' : ''} found`;
-
-        stations.forEach(station => {
-          const isActive = station.operating === true;
-          const state    = isActive ? 'active' : 'inactive';
-
-          const li = document.createElement('li');
-
-          const dot = document.createElement('span');
-          dot.className = `dot ${state}`;
-
-          const name = document.createElement('span');
-          name.className = `station-name ${state}`;
-          name.textContent = station.officialName || station.name || station.id;
-
-          const code = document.createElement('span');
-          code.className = 'station-code';
-          code.textContent = station.code || '';
-          if (station.code) code.setAttribute('aria-label', `Station code ${station.code}`);
-
-          li.appendChild(dot);
-          li.appendChild(name);
-          li.appendChild(code);
-          listEl.appendChild(li);
-        });
-      } catch (err) {
-        statusEl.textContent = 'Failed to load stations.';
-        errorEl.style.display = 'block';
-        errorEl.textContent   = `Error: ${err.message}`;
-        console.error(err);
-      }
-    }
-
-    loadStations();
-  </script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
